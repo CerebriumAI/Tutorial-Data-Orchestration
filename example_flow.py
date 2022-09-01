@@ -6,6 +6,7 @@ from prefect import flow, task
 def foo():
     print("foo 1")
 
+
 @task
 def foo_name(name):
     print(f"foo {name}")

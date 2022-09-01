@@ -6,6 +6,7 @@ import asyncio
 def foo():
     print("foo 1")
 
+
 @task
 async def foo_name(name):
     print(f"foo 2 - {name}")

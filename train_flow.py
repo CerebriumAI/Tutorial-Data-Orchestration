@@ -1,10 +1,14 @@
 from prefect import flow, task
+
 import numpy as np
 import pandas as pd
+
 from sklearn.preprocessing import OneHotEncoder
-from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
+from xgboost import XGBClassifier
+
 import bentoml
+
 
 @task(retries=5)
 def load_data(data_path):
@@ -15,6 +19,16 @@ def load_data(data_path):
         axis=0,
     )
     return df
+
+
+@task
+def train_ohe(df):
+    # Use one-hot encoding to encode the categorical features
+    X = df[["ProductCD", "P_emaildomain", "R_emaildomain", "card4", "M1", "M2", "M3"]]
+    enc = OneHotEncoder(handle_unknown="ignore")
+    enc.fit(X)
+    return enc
+
 
 @task
 def split_data(df, enc):
@@ -31,13 +45,6 @@ def split_data(df, enc):
     )
     return X_train, X_test, y_train, y_test
 
-@task
-def train_ohe(df):
-    # Use one-hot encoding to encode the categorical features
-    X = df[["ProductCD", "P_emaildomain", "R_emaildomain", "card4", "M1", "M2", "M3"]]
-    enc = OneHotEncoder(handle_unknown="ignore")
-    enc.fit(X)
-    return enc
 
 @task
 def train_xgb(X_train, y_train):
@@ -57,6 +64,7 @@ def train_xgb(X_train, y_train):
     )
     model = xgb.fit(X_train, y_train)
     return model
+
 
 @task
 def save_model(model, enc, version, stage):
@@ -78,20 +86,13 @@ def save_model(model, enc, version, stage):
 
 
 @flow
-def train_flow(
-    data_path, 
-    version, 
-    stage
-):
+def train_flow(data_path, version, stage):
     df = load_data(data_path)
     enc = train_ohe(df)
     X_train, _, y_train, _ = split_data(df, enc)
     model = train_xgb(X_train, y_train)
     save_model(model, enc, version, stage)
 
+
 if __name__ == "__main__":
-    train_flow(
-        data_path="data/train_transaction.csv",
-        version="1.0.1",
-        stage="prod"
-    )
+    train_flow(data_path="data/train_transaction.csv", version="1.0.1", stage="prod")
