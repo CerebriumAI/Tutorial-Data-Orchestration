@@ -208,6 +208,111 @@ python train_flow.py
 ```
 
 Congratulations! You've created a training pipeline to train a model with Prefect. 
-### Orion
 
-## Prefect Deployment
+
+## Prefect Deployments
+Up to this point, you may still be wondering how Prefect adds much value to your workflow beyond logging and retries. After all, we have only basically written a standard training script with extra wrappers. The answer is simple: your workflows  can be orchestrated by Prefect's orchestration engine, Orion. This is the central component, and will allow you to schedule and orchestrate multiple workflows; simultaneously, in parallel and in an automated fashion.
+
+### Local Orion Environment
+To get started, we'll start a local instance of Orion in a separate terminal. You'll be able to check out the Prefect dashboard at [localhost:4200](http://localhost:4200). There are a number of different bits of information you can view here, including the status of your workflows, the logs of your workflows, run details and scheduled runs, among other things.
+
+```bash
+prefect orion start
+```
+
+You should be greeted with the dashboard similar to this one displaying the status of your recent local runs:
+![Orion Dashboard](media/orion_dashboard.png)
+
+With Orion, you are able to:
+- Schedule workflows
+- Create Deployments
+- Configure agents (more on this later)
+- Trigger a workflow
+
+Now that we have Orion running, we can register our flow with Prefect. We will do this with a Prefect *deployment*. A deployment encapsulates a flow, and allows it to be scheduled and run by the API. The kind of metadata included with a deployment is where your flow has been stored and how it should be run.
+
+To create a deployment, run:
+```bash
+prefect deployment build ./train_flow.py:train_flow -n train_fraud_classifier -q "ml-training"
+```
+This will create a deployment with the name `train_fraud_classifier` which operates in the work queue `ml-training` which is automatically created. In Prefect, a *work queue* schedules the workflows, while an *agent* is responsible for polling the work queues for new runs to execute.
+
+This should create a deployment file in your current directory, `train_flow-deployment.yaml`, and a file used to omit certain files from the flow, `.prefectignore`.
+```yaml
+###
+### A complete description of a Prefect Deployment for flow 'train-flow'
+###
+name: train_fraud_classifier
+description: null
+version: b532662733a67402a4055f1a4d8cd711
+# The work queue that will handle this deployment's runs
+work_queue_name: ml-training
+tags: []
+parameters: {}
+schedule: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command:
+  - python
+  - -m
+  - prefect.engine
+  stream_output: true
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: train-flow
+manifest_path: null
+storage: null
+path: /Users/elijahrou/Cerebrium/Tutorial-Data-Orchestration
+entrypoint: train_flow.py:train_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    data_path:
+      title: data_path
+    version:
+      title: version
+    stage:
+      title: stage
+  required:
+  - data_path
+  - version
+  - stage
+  definitions: null
+```
+
+Once we've configured the deployment, we can create it on the API!
+```bash
+prefect deployment apply train_flow-deployment.yaml
+```
+
+We can inspect the deployment with the CLI:
+```bash
+prefect deployment ls
+```
+You will also notice that your deployment now shows in the dashboard under the **Deployments** tab.
+![Orion Deployments](media/orion_dashboard_deployment.png)
+
+You may have noticed that Prefect prompted you to start an agent for the `ml-training` work queue when you deployed your flow. Let's do that now in a new tab.
+```bash
+prefect agent start -q 'ml-training'
+```
+
+Finally, let's run our training flow! In the Orion UI navigate to the **Deployments** tab and click on the deployment you just created. On the top right, you'll see a button to run the deployment. Hit it and select **Custom**. Finally, select *Custom* for the parameter values, fill out the following values and press *run*:
+- `data_path`: `data/train_transaction.csv`
+- `version`: `1.0.1`
+- `stage`: `prod`
+![Orion Deployment Run](media/orion_dashboard_deployment_run.png)
+
+If you now navigate to the **Flow Runs** tab, you should see a new run for your flow. Click it and observe it running in action!
+![Orion Flow Runs](media/orion_dashboard_flow_runs.png)
+
+### Cloud Orion Environment
+As demonstrated, Prefect needs two core active components to run: an agent and the orchestration engine. Running Prefect in the cloud is easy, you simply need to setup both components and deploy your flows to the remote engine.
