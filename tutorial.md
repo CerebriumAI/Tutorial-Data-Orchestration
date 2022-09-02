@@ -213,7 +213,7 @@ Congratulations! You've created a training pipeline to train a model with Prefec
 ## Prefect Deployments
 Up to this point, you may still be wondering how Prefect adds much value to your workflow beyond logging and retries. After all, we have only basically written a standard training script with extra wrappers. The answer is simple: your workflows  can be orchestrated by Prefect's orchestration engine, Orion. This is the central component, and will allow you to schedule and orchestrate multiple workflows; simultaneously, in parallel and in an automated fashion.
 
-### Local Orion Environment
+### Local Prefect Environment
 To get started, we'll start a local instance of Orion in a separate terminal. You'll be able to check out the Prefect dashboard at [localhost:4200](http://localhost:4200). There are a number of different bits of information you can view here, including the status of your workflows, the logs of your workflows, run details and scheduled runs, among other things.
 
 ```bash
@@ -314,5 +314,8 @@ Finally, let's run our training flow! In the Orion UI navigate to the **Deployme
 If you now navigate to the **Flow Runs** tab, you should see a new run for your flow. Click it and observe it running in action!
 ![Orion Flow Runs](media/orion_dashboard_flow_runs.png)
 
-### Cloud Orion Environment
+### Cloud Prefect Environment
 As demonstrated, Prefect needs two core active components to run: an agent and the orchestration engine. Running Prefect in the cloud is easy, you simply need to setup both components and deploy your flows to the remote engine.
+
+#### Orion Setup
+
