@@ -22,7 +22,7 @@ This tutorial assumes you have done the [previous tutorial](https://hippocampus.
 ## Prefect Setup & Concepts
 To get started, we will first install Prefect. As per usual, ensure you are in a virtual environment you have set up. You may also need to install `sqlite3`.
 ```bash
-pip install prefect==2.0
+pip install prefect==2.3.1
 ```
 
 A Prefect workflow is a Python script that defines a set of processes to be run in a specific order with specific dependencies on each other. There are only two core constructs you really need to know in Prefect: a **flow** and a **task**. You can think of a *flow* as the function that defines the order of execution of the tasks, while a *task* is a function that represents a discrete unit of work to be executed. To demonstrate this, let's create a simple flow example called `example_flow.py`.
