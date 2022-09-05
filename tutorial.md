@@ -1,4 +1,4 @@
-# Data Orchestration Pipelines with Prefect
+# Workflow Orchestration Pipelines with Prefect
 
 In this tutorial, we will introduce the idea of data orchestration pipelines and show how you can do continuous model retraining.
 
