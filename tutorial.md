@@ -2,7 +2,7 @@
 
 In this tutorial, we will introduce the idea of data orchestration pipelines and show how you can do continuous model retraining.
 
-Often times, we need to conduct quite complex processes for data extraction, cleaning, and modeling. Furthermore, we often need to run these jobs to run more than once on a regular schedule, potentially in parallel. For this tutorial, we are entering the data engineering world with a simple data orchestration pipeline for training our fraud classifier from previous tutorials.
+Often times, we need to conduct quite complex processes for data extraction, cleaning, and modeling. Furthermore, we often need to run these jobs more than once on a regular schedule, potentially in parallel. For this tutorial, we are entering the data engineering world with a simple data orchestration pipeline for training our fraud classifier from previous tutorials.
 
 The core technology of this tutorial is [Prefect](https://docs.prefect.io), a Python framework and tool for conducting such orchestration. Prefect provides useful abstractions running orchestration jobs, a mechanism for running jobs in the cloud and the ability to run sub-processes for jobs concurrently (across multiple machines if you wish). It also provides all the utilities you would need to conduct your jobs robustly, such as logging, retries, caching, and more.
 
@@ -51,7 +51,16 @@ def foo_flow(names):
 # Call the flow
 foo_flow(["2 - electric boogaloo", "3 - gigantic spree"])
 ```
-In this Prefect flow, we have defined two tasks: `foo` and `foo_name`. The `foo` task simply prints "foo" to the console. The `foo_name` task takes a single argument, `name`, and prints a message to the console with the value of "foo `name`". The foo_flow function is the flow that we will run, and orchestrates the execution of the tasks. In this case, we run `foo` first, then submit two instances of `foo_name` to Prefect using our input array. The `.submit` method is a convenience method that allows us to submit tasks for concurrent execution. You can run the flow in your terminal by running `python example_flow.py`.
+In this Prefect flow, we have defined two tasks: `foo` and `foo_name`. 
+- The `foo` task simply prints "foo" to the console. 
+- The `foo_name` task takes a single argument `name`, and prints a message to the console with the value of "foo `name`". 
+
+The `foo_flow` function is the wrapper for the flow we will run, and will orchestrate the execution of the tasks. In this case, we run `foo` first and submit two instances of `foo_name` to Prefect using our input array.
+
+The `.submit` method is a convenience method that allows us to submit tasks for concurrent execution. You can run the flow in your terminal by running: 
+```
+python example_flow.py
+```
 
 This is a very simple flow, but it is a good example of how to define a workflow in Prefect. If you'd like more granular control over the execution of tasks, you can convert your flow and tasks to be *async*.
 ```python
@@ -71,8 +80,10 @@ async def foo_name(name):
 ## Flow
 @flow
 async def foo_flow(names):
+    # Create all the futures with .gather
     await asyncio.gather(*[foo_name(name) for name in names])
     foo()
+    # Run the Futures
     await foo_name.submit(names)
 
 
@@ -213,8 +224,7 @@ Congratulations! You've created a workflow to train a model with Prefect and cre
 ## Prefect Deployments
 Up to this point, you may still be wondering how Prefect adds much value to your workflow beyond logging and retries. After all, we have only basically written a standard training script with extra wrappers. The answer is simple: your workflows  can be orchestrated by Prefect's orchestration engine, Orion. This is the central component, and will allow you to schedule and orchestrate multiple workflows; simultaneously, in parallel and in an automated fashion.
 
-To get started, we'll start a local instance of Orion in a separate terminal. You'll be able to check out the Prefect dashboard at [localhost:4200](http://localhost:4200). There are a number of different bits of information you can view here, including the status of your workflows, the logs of your workflows, run details and scheduled runs, among other things.
-
+To get started, we'll start a local instance of Orion in a separate terminal. You'll be able to check out the Prefect dashboard at [localhost:4200](http://localhost:4200). There are a number of different bits of information you can view here. This includes the status of your workflows, the logs of your workflows, specific run details and your currently scheduled runs.
 ```bash
 prefect orion start
 ```
@@ -311,7 +321,7 @@ Finally, let's run our training flow! In the Orion UI navigate to the **Deployme
 ![Orion Deployment Run](media/orion_dashboard_deployment_run.png)
 
 If you now navigate to the **Flow Runs** tab, you should see a new run for your flow. Click it and observe it running in action!
-![Orion Flow Runs](media/orion_dashboard_flow_runs.png)
+![Orion Flow Runs](media/orion_dashboard_flow_run.png)
 
 Since it is just a CLI command, Orion can be setup on any hosted VM instance. Alternatively, Prefect also supplies a hosted version of Orion in the form of Prefect Cloud. If you'd like to learn to setup Prefect Cloud, check out the [Prefect Cloud documentation](https://docs.prefect.io/ui/cloud-getting-started/).
 
