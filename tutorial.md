@@ -207,7 +207,7 @@ You're all set. Now let's run the flow.
 python train_flow.py
 ```
 
-Congratulations! You've created a training pipeline to train a model with Prefect. 
+Congratulations! You've created a workflow to train a model with Prefect and creates a new Bento for that model in the Bento model store. In production, you would create a separate flow to pull the latest bento model from the model store, test it, and deploy it to a production environment if it passes the tests. Since the goal of this tutorial is not to create a continuous retraining system, we will build out the rest of the pipeline in another tutorial. 
 
 
 ## Prefect Deployments
@@ -304,7 +304,7 @@ You may have noticed that Prefect prompted you to start an agent for the `ml-tra
 prefect agent start -q 'ml-training'
 ```
 
-Finally, let's run our training flow! In the Orion UI navigate to the **Deployments** tab and click on the deployment you just created. On the top right, you'll see a button to run the deployment. Hit it and select **Custom**. Finally, select *Custom* for the parameter values, fill out the following values and press *run*:
+Finally, let's run our training flow! In the Orion UI navigate to the **Deployments** tab and click on the deployment you just created. On the top right, you'll see a button to run the deployment. Hit it and select **Custom**. Finally, select *Custom* for the parameter values, fill out the following values and press *run*. These values will be passed to the flow run as parameters by Orion, and are the same parameters used by the `train_flow` flow function we created.
 - `data_path`: `data/train_transaction.csv`
 - `version`: `1.0.1`
 - `stage`: `prod`
