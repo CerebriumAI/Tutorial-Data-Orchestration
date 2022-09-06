@@ -218,7 +218,7 @@ You're all set. Now let's run the flow.
 python train_flow.py
 ```
 
-Congratulations! You've created a workflow to train a model with Prefect and creates a new Bento for that model in the Bento model store. In production, you would create a separate flow to pull the latest bento model from the model store, test it, and deploy it to a production environment if it passes the tests. Since the goal of this tutorial is not to create a continuous retraining system, we will build out the rest of the pipeline in another tutorial. 
+Congratulations! You've created a workflow that trains a model with Prefect and creates a new Bento for that model in the Bento model store. In production, you would create a separate flow to pull the latest bento model from the model store, test it, and deploy it to a production environment if it passes the tests. Since the goal of this tutorial is not to create a continuous retraining system, we will build out the rest of the pipeline in another tutorial. 
 
 
 ## Prefect Deployments
@@ -323,6 +323,6 @@ Finally, let's run our training flow! In the Orion UI navigate to the **Deployme
 If you now navigate to the **Flow Runs** tab, you should see a new run for your flow. Click it and observe it running in action!
 ![Orion Flow Runs](media/orion_dashboard_flow_run.png)
 
-Since it is just a CLI command, Orion can be setup on any hosted VM instance. Alternatively, Prefect also supplies a hosted version of Orion in the form of Prefect Cloud. If you'd like to learn to setup Prefect Cloud, check out the [Prefect Cloud documentation](https://docs.prefect.io/ui/cloud-getting-started/).
+Since it is just a CLI command, Orion can be set up on any hosted VM instance. Alternatively, Prefect also supplies a hosted version of Orion in the form of Prefect Cloud. If you'd like to learn to set up Prefect Cloud, check out the [Prefect Cloud documentation](https://docs.prefect.io/ui/cloud-getting-started/).
 
 
